@@ -1,0 +1,16 @@
+{
+  "name": "mangosteen/mangosteen",
+  "description": "Mangosteen Laravel Package Development",
+  "type": "library",
+  "authors": [
+    {
+      "name": "Bui Duc Thien",
+      "email": "buithien160@gmail.com"
+    }
+  ],
+  "autoload": {
+    "psr-4": {
+      "Mangosteen\\": "src/app/"
+    }
+  }
+}
