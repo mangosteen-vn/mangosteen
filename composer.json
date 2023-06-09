@@ -4,10 +4,10 @@
   "type": "library",
   "authors": [
     {
-      "name": "Bui Duc Thien",
-      "email": "buithien160@gmail.com"
-    }
-  ],
+        "name": "BuiDucThien",
+        "email": "buithien160@gmail.com"
+      }
+],
   "autoload": {
     "psr-4": {
       "Mangosteen\\": "src/app/"
