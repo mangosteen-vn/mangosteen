@@ -1,16 +1,26 @@
 {
-  "name": "mangosteen/mangosteen",
-  "description": "Mangosteen Laravel Package Development",
-  "type": "library",
-  "authors": [
-    {
-        "name": "BuiDucThien",
-        "email": "buithien160@gmail.com"
-      }
-],
-  "autoload": {
-    "psr-4": {
-      "Mangosteen\\": "src/app/"
+    "name": "mangosteen/mangosteen",
+    "description": "Mangosteen Laravel Package Development",
+    "type": "library",
+    "authors": [
+        {
+            "name": "BuiDucThien",
+            "email": "buithien160@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Mangosteen\\User\\": "src/user/src/app/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Mangosteen\\User\\Providers\\UserServiceProvider"
+            ]
+        }
+    },
+    "require": {
+        "tymon/jwt-auth": "^2.0"
     }
-  }
 }
