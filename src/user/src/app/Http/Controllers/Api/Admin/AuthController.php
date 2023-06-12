@@ -5,6 +5,7 @@ namespace Mangosteen\User\Http\Controllers\Api\Admin;
 use App\Http\Controllers\Controller;
 use Exception;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Mangosteen\Models\Entities\Role;
@@ -16,11 +17,6 @@ use Mangosteen\Models\Entities\User;
  */
 class AuthController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('auth:api', ['except' => ['login']]);
-    }
-
     /**
      * @return JsonResponse
      */
@@ -46,9 +42,9 @@ class AuthController extends Controller
     protected function respondWithToken($token): JsonResponse
     {
         return response()->json([
-            'access_token' => $token,
-            'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'accessToken' => $token,
+            'tokenType' => 'bearer',
+            'expiresIn' => auth()->factory()->getTTL() * 60
         ]);
     }
 
@@ -103,8 +99,8 @@ class AuthController extends Controller
 
             return $this->respondWithToken($token);
         } catch (Exception $e) {
-            // throw $e;
-            return response()->json(['error' => 'An error occurred'], 500);
+            throw $e;
+//            return response()->json(['error' => 'An error occurred'], 500);
         }
     }
 
@@ -143,4 +139,17 @@ class AuthController extends Controller
             $user->roles()->attach($userRole);
         }
     }
+
+    public function checkAdminRole()
+    {
+        $user = auth()->user();
+
+        $adminRoles = ['admin', 'super admin'];
+        $userRoles = $user->roles->pluck('slug')->toArray();
+
+        $isAdmin = array_intersect($adminRoles, $userRoles) !== [];
+
+        return response()->json(['isAdmin' => $isAdmin]);
+    }
+
 }
