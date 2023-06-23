@@ -10,17 +10,20 @@
     ],
     "autoload": {
         "psr-4": {
+            "Mangosteen\\File\\": "src/file/src/app/",
             "Mangosteen\\User\\": "src/user/src/app/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
+                "Mangosteen\\File\\Providers\\FileServiceProvider",
                 "Mangosteen\\User\\Providers\\UserServiceProvider"
             ]
         }
     },
     "require": {
-        "tymon/jwt-auth": "^2.0"
+        "tymon/jwt-auth": "^2.0",
+        "intervention/image": "^2.7"
     }
 }

@@ -52,7 +52,7 @@ class AuthController extends Controller
      * @param Request $request
      * @return JsonResponse
      */
-    public function handleLoginWithFirebase(Request $request)
+    public function handleLoginWithFirebase(Request $request): JsonResponse
     {
         $name = $request->get('name');
         $email = $request->get('email');
@@ -144,12 +144,9 @@ class AuthController extends Controller
     {
         $user = auth()->user();
 
-        $adminRoles = ['admin', 'super admin'];
-        $userRoles = $user->roles->pluck('slug')->toArray();
+        $userRole = $user->roles->pluck('slug')->implode(',');
 
-        $isAdmin = array_intersect($adminRoles, $userRoles) !== [];
-
-        return response()->json(['isAdmin' => $isAdmin]);
+        return response()->json(['userRole' => $userRole]);
     }
 
 }
