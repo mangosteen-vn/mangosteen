@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Mangosteen\File\Http\Controllers\Api\Admin\FileController;
+use Mangosteen\Product\Http\Controllers\Api\Admin\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,7 +14,6 @@ use Mangosteen\File\Http\Controllers\Api\Admin\FileController;
 |
 */
 
-Route::group(['prefix' => 'api/admin'], static function () {
-    Route::get('collection', [\Mangosteen\Collection\Http\Controllers\Api\Admin\CollectionController::class, 'index']);
-    Route::post('collection', [\Mangosteen\Collection\Http\Controllers\Api\Admin\CollectionController::class, 'store']);
+Route::group(['prefix' => 'api/admin',], static function () {
+    Route::post('/product', [ProductController::class, 'index']);
 });
