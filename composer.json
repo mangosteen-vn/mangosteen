@@ -28,6 +28,7 @@
     },
     "require": {
         "tymon/jwt-auth": "^2.0",
-        "intervention/image": "^2.7"
+        "intervention/image": "^2.7",
+        "spatie/laravel-medialibrary": "^10.0.0"
     }
 }

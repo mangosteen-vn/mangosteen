@@ -23,21 +23,48 @@ class CollectionController extends Controller
 
         $query = Collection::orderBy('id', 'desc');
 
-        $result = $perPage === -1 ? $query->get() : $query->paginate($perPage);
+        $collections = $perPage === -1 ? $query->get() : $query->paginate($perPage);
 
-        return new CollectionCollection($result);
+        return new CollectionCollection($collections);
     }
 
     public function store(Request $request): CollectionResource
     {
-        $data = $request->validate([
-            'name'=> ['required', 'unique:collections']
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:collections'],
+            'type' => ['required', 'string', 'unique:collections'],
         ]);
 
-        $collection = Collection::create([
-            'name' => $data['name'],
-        ]);
+        $collection = new Collection();
+        $collection->fill($request->only(['name', 'type']));
+        $collection->save();
 
         return new CollectionResource($collection);
     }
+
+    public function destroy($id): \Illuminate\Http\JsonResponse
+    {
+        $collection = Collection::findOrFail($id);
+        $collection->delete();
+        return response()->json(['data' => ['success' => true]]);
+    }
+
+    public function show($id): CollectionResource
+    {
+        $collection = Collection::findOrFail($id);
+        return new CollectionResource($collection);
+    }
+
+    public function update(Request $request, $id): CollectionResource
+    {
+        $request->validate([
+            'name' => ['required', 'string', 'max:255', 'unique:collections,name'],
+        ]);
+
+        $collection = Collection::findOrFail($id);
+        $collection->update($request->only('name'));
+
+        return new CollectionResource($collection);
+    }
+
 }
