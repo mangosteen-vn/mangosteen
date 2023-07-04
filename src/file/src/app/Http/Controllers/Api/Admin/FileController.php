@@ -17,6 +17,10 @@ class FileController extends Controller
      */
     public function uploadImage(Request $request): \Illuminate\Http\JsonResponse
     {
+        $request->validate([
+            'image' => 'required|image'
+        ]);
+
         $file = $request->file('image');
 
         $image = Image::make($file)->encode('webp', 100);

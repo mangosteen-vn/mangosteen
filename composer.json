@@ -10,20 +10,25 @@
     ],
     "autoload": {
         "psr-4": {
+            "Mangosteen\\Collection\\": "src/collection/src/app/",
             "Mangosteen\\File\\": "src/file/src/app/",
+            "Mangosteen\\Product\\": "src/product/src/app/",
             "Mangosteen\\User\\": "src/user/src/app/"
         }
     },
     "extra": {
         "laravel": {
             "providers": [
+                "Mangosteen\\Collection\\Providers\\CollectionServiceProvider",
                 "Mangosteen\\File\\Providers\\FileServiceProvider",
+                "Mangosteen\\Product\\Providers\\ProductServiceProvider",
                 "Mangosteen\\User\\Providers\\UserServiceProvider"
             ]
         }
     },
     "require": {
         "tymon/jwt-auth": "^2.0",
-        "intervention/image": "^2.7"
+        "intervention/image": "^2.7",
+        "spatie/laravel-medialibrary": "^10.0.0"
     }
 }
