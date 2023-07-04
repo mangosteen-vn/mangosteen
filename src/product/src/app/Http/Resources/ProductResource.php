@@ -46,7 +46,8 @@ class ProductResource extends JsonResource
                     'id' => $media->id,
                     'url' => $media->getUrl(),
                 ];
-            }),            'created_at' => $this->created_at,
+            }),
+            'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
     }
