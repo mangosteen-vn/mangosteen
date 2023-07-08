@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Mangosteen\Product\Http\Controllers\Api\Admin\ProductController;
 
 /*
 |--------------------------------------------------------------------------
@@ -15,9 +14,9 @@ use Mangosteen\Product\Http\Controllers\Api\Admin\ProductController;
 */
 
 Route::group(['prefix' => 'api/admin',], static function () {
-    Route::get('/product', [ProductController::class, 'index']);
-    Route::post('/product', [ProductController::class, 'store']);
-    Route::put('/product/{id}', [ProductController::class, 'update']);
-    Route::delete('/product/{id}', [ProductController::class, 'destroy']);
-    Route::get('/product/{id}', [ProductController::class, 'show']);
+    Route::get('/product', [\Mangosteen\Product\Http\Controllers\Api\Admin\ProductController::class, 'index']);
+    Route::post('/product', [\Mangosteen\Product\Http\Controllers\Api\Admin\ProductController::class, 'store']);
+    Route::put('/product/{id}', [\Mangosteen\Product\Http\Controllers\Api\Admin\ProductController::class, 'update']);
+    Route::delete('/product/{id}', [\Mangosteen\Product\Http\Controllers\Api\Admin\ProductController::class, 'destroy']);
+    Route::get('/product/{id}', [\Mangosteen\Product\Http\Controllers\Api\Admin\ProductController::class, 'show']);
 });
