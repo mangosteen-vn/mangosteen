@@ -3,14 +3,12 @@
 namespace Mangosteen\Product\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
-use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mangosteen\Models\Entities\Product;
 use Mangosteen\Product\Http\Resources\ProductCollection;
 use Mangosteen\Product\Http\Resources\ProductResource;
-use Mangosteen\Tag\Services\TagService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
@@ -22,12 +20,6 @@ use Throwable;
  */
 class ProductController extends Controller
 {
-    protected TagService $tagService;
-
-    public function __construct(TagService $tagService)
-    {
-        $this->tagService = $tagService;
-    }
 
     /**
      * @param Request $request
@@ -63,8 +55,7 @@ class ProductController extends Controller
             $product = Product::create($productData);
 
             if ($request->filled('tag_names')) {
-                $tagIds = $this->tagService->createTagsAndGetIds((array)$request->get('tag_names'), 'product');
-                $product->tags()->attach($tagIds);
+                $product->attachTags((array)$request->get('tag_names'), 'product');
             }
 
             if ($request->filled('gallery')) {
@@ -146,8 +137,7 @@ class ProductController extends Controller
             }
 
             if ($request->filled('tag_names')) {
-                $tagIds = $this->tagService->createTagsAndGetIds((array)$request->get('tag_names'), 'product');
-                $product->tags()->sync($tagIds);
+                $product->syncTags((array)$request->get('tag_names'), 'product');
             }
 
             $product->save();
