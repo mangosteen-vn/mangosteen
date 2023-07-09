@@ -10,18 +10,25 @@ use Illuminate\Support\Facades\DB;
 use Mangosteen\Models\Entities\Product;
 use Mangosteen\Product\Http\Resources\ProductCollection;
 use Mangosteen\Product\Http\Resources\ProductResource;
+use Mangosteen\Tag\Services\TagService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
 use Throwable;
 
-
 /**
  *
  */
 class ProductController extends Controller
 {
+    protected TagService $tagService;
+
+    public function __construct(TagService $tagService)
+    {
+        $this->tagService = $tagService;
+    }
+
     /**
      * @param Request $request
      * @return ProductCollection
@@ -55,9 +62,9 @@ class ProductController extends Controller
 
             $product = Product::create($productData);
 
-            if ($request->filled('tag_ids')) {
-                $tag_ids = array_unique($request->get('tag_ids'));
-                $product->tags()->attach($tag_ids);
+            if ($request->filled('tag_names')) {
+                $tagIds = $this->tagService->createTagsAndGetIds((array)$request->get('tag_names'), 'product');
+                $product->tags()->attach($tagIds);
             }
 
             if ($request->filled('gallery')) {
@@ -138,8 +145,8 @@ class ProductController extends Controller
                 }
             }
 
-            if ($request->filled('tag_ids')) {
-                $tagIds = array_unique($request->get('tag_ids'));
+            if ($request->filled('tag_names')) {
+                $tagIds = $this->tagService->createTagsAndGetIds((array)$request->get('tag_names'), 'product');
                 $product->tags()->sync($tagIds);
             }
 
@@ -172,8 +179,8 @@ class ProductController extends Controller
             'collection_id' => ['nullable', 'integer', 'exists:collections,id'],
             'gallery' => ['array'],
             'gallery.*' => ['string'],
-            'tag_ids' => ['nullable','array'],
-            'tag_ids.*' => ['nullable','integer', 'exists:tags,id',]
+            'tag_names' => ['nullable','array'],
+            'tag_names.*' => ['nullable','string', ]
         ]);
     }
 
