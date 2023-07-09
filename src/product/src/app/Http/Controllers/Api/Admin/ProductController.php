@@ -3,23 +3,32 @@
 namespace Mangosteen\Product\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
+use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mangosteen\Models\Entities\Product;
 use Mangosteen\Product\Http\Resources\ProductCollection;
 use Mangosteen\Product\Http\Resources\ProductResource;
+use Mangosteen\Tag\Services\TagService;
 use Psr\Container\ContainerExceptionInterface;
 use Psr\Container\NotFoundExceptionInterface;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileDoesNotExist;
 use Spatie\MediaLibrary\MediaCollections\Exceptions\FileIsTooBig;
-
+use Throwable;
 
 /**
  *
  */
 class ProductController extends Controller
 {
+    protected TagService $tagService;
+
+    public function __construct(TagService $tagService)
+    {
+        $this->tagService = $tagService;
+    }
+
     /**
      * @param Request $request
      * @return ProductCollection
@@ -28,7 +37,7 @@ class ProductController extends Controller
     {
         $perPage = (int)$request->get('per_page', 20);
 
-        $query = Product::orderBy('id', 'desc');
+        $query = Product::latest('created_at');
 
         $products = $perPage === -1 ? $query->get() : $query->paginate($perPage);
 
@@ -45,20 +54,32 @@ class ProductController extends Controller
     {
         $this->getArr($request);
 
-        $product = new Product();
-        $product->fill($request->only(['name', 'description', 'content', 'collection_id', 'original_price', 'current_price', 'quantity', 'thumbnail']));
-        $product->quantity = $request->get('quantity') ?: 0;
+        try {
+            DB::beginTransaction();
 
-        if ($request->has('gallery') && !empty($request->gallery)) {
-            foreach ($request->gallery as $url) {
-                $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
-                $product->addMedia($path)->toMediaCollection('gallery');
+            $productData = $request->only(['name', 'description', 'content', 'collection_id', 'original_price', 'current_price', 'quantity', 'thumbnail']);
+            $productData['quantity'] = $request->get('quantity') ?: 0;
+
+            $product = Product::create($productData);
+
+            if ($request->filled('tag_names')) {
+                $tagIds = $this->tagService->createTagsAndGetIds((array)$request->get('tag_names'), 'product');
+                $product->tags()->attach($tagIds);
             }
+
+            if ($request->filled('gallery')) {
+                foreach ($request->gallery as $url) {
+                    $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
+                    $product->addMedia($path)->toMediaCollection('gallery');
+                }
+            }
+
+            DB::commit();
+            return new ProductResource($product);
+        } catch (Throwable $th) {
+            DB::rollBack();
+            throw $th;
         }
-
-        $product->save();
-
-        return new ProductResource($product);
     }
 
     /**
@@ -92,21 +113,23 @@ class ProductController extends Controller
     public function update(Request $request, $id): ProductResource
     {
         $this->getArr($request);
+
         try {
             DB::beginTransaction();
 
             $product = Product::findOrFail($id);
+
             $product->update($request->only(['name', 'description', 'content', 'collection_id']));
             $product->quantity = $request->get('quantity') ?: 0;
-            $product->thumbnail = $request->get('thumbnail') ?? $product->thumbnail;
-            $product->original_price = $request->get('original_price') ?? $product->original_price;
-            $product->current_price = $request->get('current_price') ?? $product->current_price;
+            $product->thumbnail = $request->get('thumbnail', $product->thumbnail);
+            $product->original_price = $request->get('original_price', $product->original_price);
+            $product->current_price = $request->get('current_price', $product->current_price);
 
-            if ($request->has('gallery') && !empty($request->gallery)) {
+            if ($request->filled('gallery')) {
                 $gallery = collect($request->get('gallery'));
-                $exitsGallery = $product->getMedia('gallery');
+                $existingGallery = $product->getMedia('gallery');
 
-                $exitsGallery->each(function ($media) use (&$gallery){
+                $existingGallery->each(function ($media) use (&$gallery) {
                     if ($gallery->contains($media->getFullUrl())) {
                         $gallery = $gallery->reject(function ($item) use ($media) {
                             return $item == $media->getFullUrl();
@@ -115,20 +138,29 @@ class ProductController extends Controller
                         $media->delete();
                     }
                 });
+
                 foreach ($gallery as $url) {
                     $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
                     $product->addMedia($path)->toMediaCollection('gallery');
                 }
             }
+
+            if ($request->filled('tag_names')) {
+                $tagIds = $this->tagService->createTagsAndGetIds((array)$request->get('tag_names'), 'product');
+                $product->tags()->sync($tagIds);
+            }
+
             $product->save();
+
+            DB::commit();
+
             return new ProductResource($product);
         } catch (Throwable $th) {
             DB::rollBack();
             throw $th;
-        } finally {
-            DB::commit();
         }
     }
+
 
     /**
      * @param Request $request
@@ -147,6 +179,8 @@ class ProductController extends Controller
             'collection_id' => ['nullable', 'integer', 'exists:collections,id'],
             'gallery' => ['array'],
             'gallery.*' => ['string'],
+            'tag_names' => ['nullable','array'],
+            'tag_names.*' => ['nullable','string', ]
         ]);
     }
 

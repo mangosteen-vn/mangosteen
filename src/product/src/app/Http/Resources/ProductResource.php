@@ -43,10 +43,10 @@ class ProductResource extends JsonResource
             'collection' => $this->collection,
             'gallery' => $this->media->map(function ($media) {
                 return [
-                    'id' => $media->id,
-                    'url' => $media->getUrl(),
+                    $media->getUrl(),
                 ];
             }),
+            'tags' => $this->tags,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

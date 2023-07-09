@@ -11,8 +11,10 @@
     "autoload": {
         "psr-4": {
             "Mangosteen\\Collection\\": "src/collection/src/app/",
+            "Mangosteen\\Core\\": "src/core/src/app/",
             "Mangosteen\\File\\": "src/file/src/app/",
             "Mangosteen\\Product\\": "src/product/src/app/",
+            "Mangosteen\\Tag\\": "src/tags/src/app/",
             "Mangosteen\\User\\": "src/user/src/app/"
         }
     },
@@ -20,8 +22,10 @@
         "laravel": {
             "providers": [
                 "Mangosteen\\Collection\\Providers\\CollectionServiceProvider",
+                "Mangosteen\\Core\\Providers\\CoreServiceProvider",
                 "Mangosteen\\File\\Providers\\FileServiceProvider",
                 "Mangosteen\\Product\\Providers\\ProductServiceProvider",
+                "Mangosteen\\Tag\\Providers\\TagServiceProvider",
                 "Mangosteen\\User\\Providers\\UserServiceProvider"
             ]
         }
