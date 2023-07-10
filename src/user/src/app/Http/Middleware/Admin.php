@@ -4,7 +4,7 @@ namespace Mangosteen\User\Http\Middleware;
 use Closure;
 use Illuminate\Http\JsonResponse;
 
-class AdminMiddleware
+class Admin
 {
 
     /**

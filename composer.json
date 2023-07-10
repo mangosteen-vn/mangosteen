@@ -10,11 +10,12 @@
     ],
     "autoload": {
         "psr-4": {
+            "Mangosteen\\Category\\": "src/category/src/app/",
             "Mangosteen\\Collection\\": "src/collection/src/app/",
             "Mangosteen\\Core\\": "src/core/src/app/",
             "Mangosteen\\File\\": "src/file/src/app/",
             "Mangosteen\\Product\\": "src/product/src/app/",
-            "Mangosteen\\Tag\\": "src/tags/src/app/",
+            "Mangosteen\\Tag\\": "src/tag/src/app/",
             "Mangosteen\\User\\": "src/user/src/app/"
         }
     },

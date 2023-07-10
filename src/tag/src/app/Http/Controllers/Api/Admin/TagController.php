@@ -27,10 +27,11 @@ class TagController extends Controller
     {
         $request->validate([
             'name' => ['required', 'string', 'max:255', 'unique:tags,name'],
+            'type' => ['required', 'string', 'max:255',],
         ]);
 
         $tag = new Tag();
-        $tag->fill($request->only(['name']));
+        $tag->fill($request->only(['name', 'type']));
         $tag->save();
 
         return new TagResource($tag);
@@ -45,11 +46,12 @@ class TagController extends Controller
     public function update(Request $request, $id): TagResource
     {
         $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:tags,name'],
+            'name' => ['required', 'string', 'max:255', 'unique:tags,name' ],
+            'type' => ['required', 'string', 'max:255',],
         ]);
 
         $tag = Tag::findOrFail($id);
-        $tag->update($request->only(['name']));
+        $tag->update($request->only(['name', 'type']));
 
         return new TagResource($tag);
     }
