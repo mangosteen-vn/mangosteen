@@ -58,6 +58,10 @@ class ProductController extends Controller
                 $product->attachTags((array)$request->get('tag_names'), 'product');
             }
 
+            if ($request->filled('category_ids')) {
+                $product->attachCategories((array)$request->get('category_ids'));
+            }
+
             if ($request->filled('gallery')) {
                 foreach ($request->gallery as $url) {
                     $path = ltrim(parse_url($url, PHP_URL_PATH), '/');
@@ -140,6 +144,10 @@ class ProductController extends Controller
                 $product->syncTags((array)$request->get('tag_names'), 'product');
             }
 
+            if ($request->filled('category_ids')) {
+                $product->syncCategories((array)$request->get('category_ids'));
+            }
+
             $product->save();
 
             DB::commit();
@@ -170,7 +178,9 @@ class ProductController extends Controller
             'gallery' => ['array'],
             'gallery.*' => ['string'],
             'tag_names' => ['nullable','array'],
-            'tag_names.*' => ['nullable','string', ]
+            'tag_names.*' => ['nullable','string', ],
+            'category_ids' => ['nullable', 'array'],
+            'category_ids.*' => ['nullable', 'integer' , 'exists:categories,id']
         ]);
     }
 

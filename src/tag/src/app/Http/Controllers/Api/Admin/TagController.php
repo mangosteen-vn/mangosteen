@@ -18,6 +18,10 @@ class TagController extends Controller
 
         $query = Tag::orderBy('id', 'desc');
 
+        if ($request->filled('type')){
+            $query = $query->where('type', $request->get('type'));
+        }
+
         $tag = $perPage === -1 ? $query->get() : $query->paginate($perPage);
 
         return new TagCollection($tag);

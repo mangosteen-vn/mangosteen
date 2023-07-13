@@ -7,9 +7,11 @@ use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use Mangosteen\Models\Entities\Role;
 use Mangosteen\Models\Entities\User;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 
 /**
@@ -144,9 +146,30 @@ class AuthController extends Controller
     {
         $user = auth()->user();
 
-        $userRole = $user->roles->pluck('slug')->implode(',');
+        return response()->json(['data' => $user->isAdmin()]);
+    }
 
-        return response()->json(['userRole' => $userRole]);
+    public function connect(Request $request)
+    {
+        $request->validate([
+            'token' => ['required', 'string'],
+        ]);
+
+        $token = $request->get('token');
+
+        $response = Http::withHeaders([
+            'Authorization' => 'bearer ' . $token,
+        ])->get(config('mangosteen-console.api'));
+
+        $userData = json_decode($response->body());
+
+        $credentials = User::firstOrCreate(
+            ['email' => $userData->email,]
+        );
+
+        $token = JWTAuth::fromUser($credentials);
+
+        return $this->respondWithToken($token);
     }
 
 }
